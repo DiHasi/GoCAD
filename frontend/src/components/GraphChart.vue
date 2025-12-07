@@ -50,7 +50,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .chart-container {
-  flex: 1;
+  height: 100%;
   display: flex;
 }
 .chart {
