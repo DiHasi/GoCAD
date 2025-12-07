@@ -1,0 +1,48 @@
+# .github/workflows/build-macos.yml
+name: Build macOS App
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+      - name: Install frontend deps
+        run: npm install
+        working-directory: frontend
+
+      - name: Build Wails app
+        run: wails build -platform darwin/universal
+
+      - name: Archive build
+        run: |
+          cd build/bin
+          zip -r app-macos.zip .
+        shell: bash
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GoCAD_macos
+          path: build/bin/app-macos.zip
